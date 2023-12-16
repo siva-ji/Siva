@@ -1,0 +1,58 @@
+from flask import Flask, render_template, jsonify
+import random
+
+app = Flask(__name__)
+
+# Simulated water quality data
+def generate_water_quality_data():
+    return {
+        'pH': round(random.uniform(6.5, 8.5), 2),
+        'dissolved_oxygen': round(random.uniform(5, 9), 2),
+        'turbidity': round(random.uniform(0, 5), 2),
+        'temperature': round(random.uniform(15, 25), 2)
+    }
+
+@app.route('/')
+def index():
+    water_quality_data = generate_water_quality_data()
+    return render_template('index_water_quality.html', water_quality_data=water_quality_data)
+
+@app.route('/get_water_quality_data', methods=['GET'])
+def get_water_quality_data():
+    water_quality_data = generate_water_quality_data()
+    return jsonify(water_quality_data)
+
+if __name__ == '__main__':
+    app.run(debug=True, host='0.0.0.0')
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Water Quality Monitoring</title>
+</head>
+<body>
+    <h1>Water Quality Monitoring</h1>
+    <p>Current Water Quality Data:</p>
+    <ul>
+        <li>pH: {{ water_quality_data.pH }}</li>
+        <li>Dissolved Oxygen: {{ water_quality_data.dissolved_oxygen }} mg/L</li>
+        <li>Turbidity: {{ water_quality_data.turbidity }} NTU</li>
+        <li>Temperature: {{ water_quality_data.temperature }} °C</li>
+    </ul>
+    <button onclick="updateWaterQualityData()">Update Data</button>
+
+    <script>
+        function updateWaterQualityData() {
+            fetch('/get_water_quality_data')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('pH').innerText = `pH: ${data.pH}`;
+                    document.getElementById('dissolved_oxygen').innerText = `Dissolved Oxygen: ${data.dissolved_oxygen} mg/L`;
+                    document.getElementById('turbidity').innerText = `Turbidity: ${data.turbidity} NTU`;
+                    document.getElementById('temperature').innerText = `Temperature: ${data.temperature} °C`;
+                });
+        }
+    </script>
+</body>
+</html>
