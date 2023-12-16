@@ -1,0 +1,42 @@
+from flask import Flask, render_template
+import RPi.GPIO as GPIO
+
+app = Flask(__name__)
+
+# Configure GPIO pin for the smart light
+LIGHT_PIN = 17
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(LIGHT_PIN, GPIO.OUT)
+GPIO.output(LIGHT_PIN, GPIO.LOW)  # Initial state is off
+
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+@app.route('/turn_on')
+def turn_on():
+    GPIO.output(LIGHT_PIN, GPIO.HIGH)
+    return 'Light turned on'
+
+@app.route('/turn_off')
+def turn_off():
+    GPIO.output(LIGHT_PIN, GPIO.LOW)
+    return 'Light turned off'
+
+if __name__ == '__main__':
+    app.run(debug=True, host='0.0.0.0')
+
+#HTML code for user interface 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Home</title>
+</head>
+<body>
+    <h1>Smart Home</h1>
+    <p>Light Control:</p>
+    <a href="/turn_on">Turn On</a> | <a href="/turn_off">Turn Off</a>
+</body>
+</html>
