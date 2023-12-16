@@ -1,0 +1,45 @@
+from flask import Flask, render_template, jsonify
+import random
+
+app = Flask(__name__)
+
+# Simulated energy consumption data
+current_energy_consumption = 0
+
+@app.route('/')
+def index():
+    return render_template('index_energy.html', energy_consumption=current_energy_consumption)
+
+@app.route('/get_energy_consumption', methods=['GET'])
+def get_energy_consumption():
+    global current_energy_consumption
+    # Simulate changing energy consumption values
+    current_energy_consumption = round(random.uniform(10, 50), 2)
+    return jsonify({'energy_consumption': current_energy_consumption})
+
+if __name__ == '__main__':
+    app.run(debug=True, host='0.0.0.0')
+#HTML code 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Energy Management</title>
+</head>
+<body>
+    <h1>Energy Management</h1>
+    <p>Current Energy Consumption: {{ energy_consumption }} kWh</p>
+    <button onclick="updateEnergyConsumption()">Update Energy Consumption</button>
+
+    <script>
+        function updateEnergyConsumption() {
+            fetch('/get_energy_consumption')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('energy_consumption').innerText = `Current Energy Consumption: ${data.energy_consumption} kWh`;
+                });
+        }
+    </script>
+</body>
+</html>
