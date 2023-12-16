@@ -1,0 +1,53 @@
+from flask import Flask, render_template
+
+app = Flask(__name__)
+
+# Simulate parking spaces and their availability
+parking_spaces = {
+    'A': True,
+    'B': True,
+    'C': True,
+}
+
+@app.route('/')
+def index():
+    return render_template('index.html', parking_spaces=parking_spaces)
+
+@app.route('/reserve/<space_id>')
+def reserve(space_id):
+    if space_id in parking_spaces and parking_spaces[space_id]:
+        parking_spaces[space_id] = False
+        return f'Parking space {space_id} reserved'
+    else:
+        return f'Parking space {space_id} not available'
+
+@app.route('/release/<space_id>')
+def release(space_id):
+    if space_id in parking_spaces and not parking_spaces[space_id]:
+        parking_spaces[space_id] = True
+        return f'Parking space {space_id} released'
+    else:
+        return f'Parking space {space_id} was not reserved'
+
+if __name__ == '__main__':
+    app.run(debug=True, host='0.0.0.0')
+
+
+#HTML code 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart City - Parking System</title>
+</head>
+<body>
+    <h1>Smart City - Parking System</h1>
+    <p>Parking Spaces:</p>
+    <ul>
+        {% for space_id, available in parking_spaces.items() %}
+            <li>Parking Space {{ space_id }}: {% if available %}Available{% else %}Occupied{% endif %} | <a href="/reserve/{{ space_id }}">Reserve</a> | <a href="/release/{{ space_id }}">Release</a></li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
